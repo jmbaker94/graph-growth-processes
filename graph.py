@@ -23,7 +23,6 @@ class Vertex:
 
 
 class Graph:
-    """TODO: Consider creating an O(1) look up for index to vertex"""
     def __init__(self, cl=None):
         self.__vertices = []
         self.__adj_list = defaultdict(set)
@@ -72,6 +71,37 @@ class Graph:
             raise TypeError
 
         self.__adj_list[v] = set(a_set)
+
+    def get_subgraph(self, vertices):
+        g = Graph()
+        for v in vertices:
+            g.add_vertex(v)
+            for adj in self.__adj_list[v]:
+                if adj in vertices:
+                    g.add_edge(v, adj)
+
+    @property
+    def degree_sequence(self):
+        output = []
+        for v in self.vertices:
+            output.append(v.degree)
+        return sorted(output)[::-1]
+
+    @property
+    def id_degree_sequence(self):
+        class DegPair:
+            def __init__(self, t):
+                self.data = t
+
+            def __lt__(self, other):
+                if self.data[1] < other.data[1]:
+                    return True
+                return False
+
+        output = []
+        for v in self.vertices:
+            output.append(DegPair((v, v.degree)))
+        return [(x.data[0], x.data[1]) for x in sorted(output)[::-1]]
 
     def __getitem__(self, item):
         if type(item) is int:
@@ -130,3 +160,4 @@ class Graph:
             e_string += "\n"
 
         return "Graph Object: \n\t vertices: \n" + v_string + "\t edges: \n " + e_string
+
